@@ -13,8 +13,8 @@
 // wish.
 
 
-// Twenty-four seven
-\d+/\d+
+// // Twenty-four seven
+// \d+/\d+
 
 
 // ADD YOUR PATTERNS HERE
@@ -22,5 +22,48 @@
 // The patterns will be tried from top to bottom, so it is a
 // good idea to put more specific patterns above more general
 // patterns.
+
+// URLs
+https?:\/\/.+
+
+// E-mails
+[\w\.]+@[\w\.]+\.[\w]+
+
+// Phone numbers (e.g. 1-213-555-0123, +13015550100)
+(\d+-)+\d+
+\+\d+
+
+// "Marked" numbers (e.g. 7,919,900)
+(\d+,)+\d+
+
+// Dollar amounts (e.g. $80)
+\$\d+
+
+// Combined words (e.g. can't), allow
+\w+'\w+
+// Allow apostrophe at the beginning if not also at the end (e.g. 'em but not 'gaffe')
+'\w+\Z
+
+// Time clock (e.g. 18:15:34)
+(\d+:)+\d+
+
+// Twenty-four seven
+\d+/\d+
+
+// Combined words (e.g. fully-qualified)
+\w+-\w+
+
+// Section digits (e.g. 2.4.1), IP numbers (e.g. 192.168.255.255)
+(\d+\.)+\d+
+
+// Abbreviations
+(\w+\.){2,}
+
+// File extensions (e.g. cake.ppt)
+\w+\.\w+
+
+
+
+
 
 
