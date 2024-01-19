@@ -28,5 +28,8 @@ public class PostingsList {
     // 
     //  YOUR CODE HERE
     //
+    public void insert(PostingsEntry entry) {
+        list.add(entry);
+    }
 }
 

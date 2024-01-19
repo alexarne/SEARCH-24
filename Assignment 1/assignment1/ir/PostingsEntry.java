@@ -17,6 +17,7 @@ public class PostingsEntry implements Comparable<PostingsEntry>, Serializable {
 
     public int docID;
     public double score = 0;
+    public ArrayList<Integer> occurrences = new ArrayList<>();
 
     /**
      *  PostingsEntries are compared by their score (only relevant
@@ -33,5 +34,12 @@ public class PostingsEntry implements Comparable<PostingsEntry>, Serializable {
     //
     // YOUR CODE HERE
     //
+    public PostingsEntry(int docID) {
+        this.docID = docID;
+    }
+
+    public void addOccurrence(int position) {
+        occurrences.add(position);
+    }
 }
 

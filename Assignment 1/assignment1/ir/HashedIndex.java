@@ -29,6 +29,15 @@ public class HashedIndex implements Index {
         //
         // YOUR CODE HERE
         //
+
+        // If first occurrence of this word
+        if (!index.containsKey(token)) index.put(token, new PostingsList());
+
+        // Assume in-order insertions, current doc is last doc if previously seen
+        // Doc not previously inserted
+        if (index.get(token).size() == 0 || index.get(token).get(index.get(token).size()-1).docID != docID) index.get(token).insert(new PostingsEntry(docID));
+        // Add position of token
+        index.get(token).get(index.get(token).size()-1).addOccurrence(offset);
     }
 
 
@@ -40,7 +49,7 @@ public class HashedIndex implements Index {
         //
         // REPLACE THE STATEMENT BELOW WITH YOUR CODE
         //
-        return null;
+        return index.get(token);
     }
 
 
