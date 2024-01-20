@@ -43,7 +43,12 @@ public class Searcher {
         PostingsList[] lists = new PostingsList[query.size()];
         for (int i = 0; i < query.size(); ++i) {
             lists[i] = index.getPostings(query.queryterm.get(i).term);
+            // Replace null with empty PostingsList for simplicity
+            if (lists[i] == null) lists[i] = new PostingsList();
         }
+
+        // If query is empty, return empty
+        if (query.size() == 0) return result;
 
         switch (queryType) {
             case INTERSECTION_QUERY:

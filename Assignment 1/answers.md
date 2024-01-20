@@ -50,6 +50,125 @@ A: Because it is a stricter constraint. The "normal" intersection query mode onl
 
 ## Task 1.5
 
+Query: `graduate program mathematics`
+
+```
+(0) Irrelevant document. The document does not contain any information about the
+topic.
+
+(1) Marginally relevant document. The document only points to the topic. It does not
+contain more or other information than the topic description.
+
+(2) Fairly relevant document. The document contains more information than the
+topic description, but the presentation is not exhaustive.
+
+(3) Highly relevant document. The document discusses the themes of the topic
+exhaustively.
+
+
+QUERY_ID DOC_ID RELEVANCE_SCORE
+1 Biological_Systems_Engineering.f 0 -- talks about biological systems engineering, only mentions mathematics once as a course
+1 Candidate_Statements.f 0 -- only mentions a mathematics major as candidate
+1 Computer_Science.f 0 -- only mentions a mathematics course
+1 document_translated.f 0 -- only mentions a mathematics professor/department
+1 ECE_Course_Reviews.f 0 -- only mentions a mathematics course
+1 Economics.f 0 -- talks about economics, maths is just a prerequisite
+1 Elaine_Kasimatis.f 1 -- talks about a mathematics graduate
+1 Evelyn_Silvia.f 1 -- same as above
+1 Events_Calendars.f 0 -- just a bunch of links, of which none are blatantly tied to the query
+1 Fiber_and_Polymer_Science.f 0 -- only mentions mathematics courses
+1 Hydrology.f 0 -- only mentions mathematics courses
+1 Mathematics.f 3 -- highly relevant, mentions the graduate programs etc
+1 MattHh.f 1 -- talks about a mathematics graduate
+1 Private_Tutoring.f 0 -- about private tutors, although mentions math graduates
+1 Quantitative_Biology_and_Bioinformatics.f 0 -- about biology etc, only mentions a maths course
+1 Statistics.f 2 -- not as specific as a full-on maths graduate program, but still mentions information relevant to those interested; "If you are interested in going to grad school in biostatistics, applied statistics or mathematics, or biology, this research program is for you."
+1 Student_Organizations.f 0 -- could be a 1, since it mentions a club relevant to maths students
+1 UCD_Honors_and_Prizes.f 0 -- could be a 1, since it mentions an "honorary society" for maths student
+1 UC_Davis_English_Department.f 1 -- includes a mathematics major
+1 University_Departments.f 1 -- mentions the mathematics department
+1 What_I_Wish_I_Knew...Before_Coming_to_UC_Davis_Entomology.f 2 -- contact information and deadline for applying to the mathematics department
+1 Wildlife%2C_Fish%2C_and_Conservation_Biology.f 0 -- mentions it is indirectly involved with mathematics graduate programs, but still not relevant enough
+```
+
+**Difficult cases:**
+
+```
+1 Elaine_Kasimatis.f 1 -- talks about a mathematics graduate, is that considered relevant?
+1 MattHh.f 1 -- talks about a mathematics graduate, is that considered relevant?
+1 Wildlife%2C_Fish%2C_and_Conservation_Biology.f 0 -- mentions it is indirectly involved with mathematics graduate programs, but still not relevant enough
+```
+
+**Precision and Recall**
+
+Number of returned documents with relevance > 0: 8
+
+Precision = returned and relevant / returned = 8 / 22 = 0.36
+
+Recall = returned and relevant / relevant (assumed) = 8 / 100 = 0.08
+
 ## Task 1.6
+
+Query: `graduate program mathematics UC davis`
+
+Result (18):
+
+```
+Candidate_Statements.f 0
+Computer_Science.f 0
+ECE_Course_Reviews.f 0
+Economics.f 0
+Elaine_Kasimatis.f 1
+Evelyn_Silvia.f 1
+Events_Calendars.f 0
+Hydrology.f 0
+Mathematics.f 3
+MattHh.f 1
+Private_Tutoring.f 0
+Statistics.f 2
+Student_Organizations.f 0
+UCD_Honors_and_Prizes.f 0
+UC_Davis_English_Department.f 1
+University_Departments.f 1
+What_I_Wish_I_Knew...Before_Coming_to_UC_Davis_Entomology.f 2
+Wildlife%2C_Fish%2C_and_Conservation_Biology.f 0
+```
+
+Number of returned documents with relevance > 0: 8
+
+Precision = returned and relevant / returned = 8 / 18 = 0.44
+
+Recall = returned and relevant / relevant (assumed) = 8 / 100 = 0.08
+
+New query: `graduate program mathematics UC davis department`
+
+Result (14):
+
+```
+Candidate_Statements.f 0
+Computer_Science.f 0
+ECE_Course_Reviews.f 0
+Evelyn_Silvia.f 1
+Events_Calendars.f 0
+Hydrology.f 0
+Mathematics.f 3
+Private_Tutoring.f 0
+Statistics.f 2
+UCD_Honors_and_Prizes.f 0
+UC_Davis_English_Department.f 1
+University_Departments.f 1
+What_I_Wish_I_Knew...Before_Coming_to_UC_Davis_Entomology.f 2
+Wildlife%2C_Fish%2C_and_Conservation_Biology.f 0
+```
+
+Number of returned documents with relevance > 0: 6
+
+Precision = returned and relevant / returned = 6 / 14 = 0.43
+
+Recall = returned and relevant / relevant (assumed) = 6 / 100 = 0.06
+
+**Why you think that the final query gave better precision and/or recall than the earlier variants.** They become more specific to the purpose, which weeds out unrelated documents that do not contain those specific terms.
+
+**Why can we not simply set the query to be the entire information need description?** It would for example result in just 1 matching document, because all terms from the query would have to be present, which is an unreasonable requirement since we do not need it to strictly contain the word "info", etc..
 
 ## Task 1.7
