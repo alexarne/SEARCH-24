@@ -52,8 +52,6 @@ public class Searcher {
 
         switch (queryType) {
             case INTERSECTION_QUERY:
-                System.out.println("intersect");
-            
                 // // Sort in order of increasing length (Seems to be marginally slower, though)
                 // Arrays.sort(lists, (PostingsList a, PostingsList b) -> a.size() - b.size());
 
@@ -65,16 +63,14 @@ public class Searcher {
 
                 break;
             case PHRASE_QUERY:
-                System.out.println("phrase");
-                
+
                 result = lists[0];
                 for (int i = 1; i < query.size(); ++i) {
                     result = positionalIntersect(result, lists[i], i);
                 }
-                
+
                 break;
             case RANKED_QUERY:
-                System.out.println("ranked");
                 
                 break;
         

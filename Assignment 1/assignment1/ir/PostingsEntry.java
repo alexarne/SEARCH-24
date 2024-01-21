@@ -41,5 +41,32 @@ public class PostingsEntry implements Comparable<PostingsEntry>, Serializable {
     public void addOccurrence(int position) {
         occurrences.add(position);
     }
+
+    // term:PostingsList
+    // PostingsList:    PostingsEntry1,PostingsEntry2,PostingsEntry3,...
+    // PostingsEntry:   docID=pos1;pos2;pos3;...
+    // Final:           docID1=pos1;pos2;pos3;...,docID2=pos1;pos2;pos3;...,...
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+        str.append(docID);
+        str.append("=");
+        for (Integer pos : occurrences) {
+            str.append(pos);
+            str.append(";");
+        }
+        str.deleteCharAt(str.length() - 1);
+        return str.toString();
+    }
+
+    public PostingsEntry() {}
+
+    public PostingsEntry(String data) {
+        String[] fields = data.split("=");
+        this.docID = Integer.parseInt(fields[0]);
+        String[] positions = fields[1].split(";");
+        for (String pos : positions) {
+            addOccurrence(Integer.valueOf(pos));
+        }
+    }
 }
 

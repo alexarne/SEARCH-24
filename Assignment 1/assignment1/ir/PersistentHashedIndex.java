@@ -65,7 +65,16 @@ public class PersistentHashedIndex implements Index {
         //
         //  YOUR CODE HERE
         //
+        long ptr;
+        int size; 
+
+        public Entry(long ptr, int size) {
+            this.ptr = ptr;
+            this.size = size;
+        }
     }
+
+    int ENTRY_SIZE = 12;        // 12 bytes per entry (long + int)
 
 
     // ==================================================================
@@ -139,6 +148,15 @@ public class PersistentHashedIndex implements Index {
         //
         //  YOUR CODE HERE
         //
+        try {
+            dictionaryFile.seek(ptr);
+            dictionaryFile.writeLong(entry.ptr);
+            dictionaryFile.seek(ptr + 8);
+            dictionaryFile.writeInt(entry.size);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -150,6 +168,15 @@ public class PersistentHashedIndex implements Index {
         //
         //  REPLACE THE STATEMENT BELOW WITH YOUR CODE 
         //
+        try {
+            dictionaryFile.seek(ptr);
+            long entry_ptr = dictionaryFile.readLong();
+            dictionaryFile.seek(ptr + 8);
+            int entry_size = dictionaryFile.readInt();
+            Entry entry = new Entry(entry_ptr, entry_size);
+            return entry;
+        } catch (IOException e) {
+        }
         return null;
     }
 
@@ -207,6 +234,24 @@ public class PersistentHashedIndex implements Index {
             // 
             //  YOUR CODE HERE
             //
+            for (String key : index.keySet()) {
+                // Find empty slot in dictionary
+                long hash = hash(key);
+                while (entryExists(hash)) {
+                    hash = (hash + 1) % TABLESIZE;
+                    ++collisions;
+                }
+
+                // Write to dataFile
+                String data = key + " " + index.get(key).toString() + "\n";
+                int size = writeData(data, free);
+
+                // Write to dictionaryFile
+                Entry entry = new Entry(free, size);
+                writeEntry(entry, hash * ENTRY_SIZE);
+                
+                free += size;
+            }
         } catch ( IOException e ) {
             e.printStackTrace();
         }
@@ -225,6 +270,18 @@ public class PersistentHashedIndex implements Index {
         //
         //  REPLACE THE STATEMENT BELOW WITH YOUR CODE
         //
+
+        long hash = hash(token);
+        while (entryExists(hash)) {
+            Entry entry = readEntry(hash * ENTRY_SIZE);
+            String[] data = readData(entry.ptr, entry.size).split(" ");
+            if (data[0].equals(token)) return new PostingsList(data[1].trim());
+
+            // Try next slot
+            ++hash;
+        }
+        
+        // No match
         return null;
     }
 
@@ -236,6 +293,30 @@ public class PersistentHashedIndex implements Index {
         //
         //  YOUR CODE HERE
         //
+
+        // If first occurrence of this word
+        if (!index.containsKey(token)) index.put(token, new PostingsList());
+
+        // Assume in-order insertions, current doc is last doc if previously seen
+        // Doc not previously inserted
+        if (index.get(token).size() == 0 || index.get(token).get(index.get(token).size()-1).docID != docID) index.get(token).insert(new PostingsEntry(docID));
+        // Add position of token
+        index.get(token).get(index.get(token).size()-1).addOccurrence(offset);
+    }
+
+    public long hash(String token) {
+        long hash = 0;
+        for (char c : token.toCharArray()) {
+            hash = (hash*50 + c) % TABLESIZE;
+        }
+        return hash;
+    }
+
+    public boolean entryExists(long hash) {
+        Entry entry = readEntry(hash * ENTRY_SIZE);
+        if (entry == null) return false;
+        if (entry.ptr == 0 && entry.size == 0) return false;
+        return true;
     }
 
 
@@ -245,7 +326,10 @@ public class PersistentHashedIndex implements Index {
     public void cleanup() {
         System.err.println( index.keySet().size() + " unique words" );
         System.err.print( "Writing index to disk..." );
+        long startTime = System.currentTimeMillis();
         writeIndex();
         System.err.println( "done!" );
+        long elapsedTime = System.currentTimeMillis() - startTime;
+        System.out.println(String.format( "Took %.1f seconds.", elapsedTime/1000.0 ));
     }
 }

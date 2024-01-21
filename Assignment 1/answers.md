@@ -172,3 +172,22 @@ Recall = returned and relevant / relevant (assumed) = 6 / 100 = 0.06
 **Why can we not simply set the query to be the entire information need description?** It would for example result in just 1 matching document, because all terms from the query would have to be present, which is an unreasonable requirement since we do not need it to strictly contain the word "info", etc..
 
 ## Task 1.7
+
+```
+compile_all.bat && run_search_engine.bat
+run_persistent.bat
+```
+
+Modified files:
+
+- PersistentHashedIndex - all
+- PostingsList - toString and constructor from string
+- PostingsEntry - toString and constructor from string
+
+![](persistent.png)
+
+When saving the hashmap to disk, go through the keys and store each PostingsList in the data file, placing it after all previously stored lists. When a PostingsList is stored, hash the key (token) and place the pointer to the PostingsList in a dictionary file at the hash position. During lookup, hash the token, go to that position in the dictionary, look at the position in the data file and see if it is the correct PostingsList. If yes, parse and return it. If no, go to the next hash slot until correct one is found (to handle collisions) or until that slot is empty (no such token exists).
+
+Hash function only needs to spread out the words and reduce collisions. Collisions will still occur. Estimate the size of the alphabet (all relevant characters in a term) to be 50 (alphabet + numbers + misc) and let each position represent a power of 50. Take modulo of the tablesize to keep it within bounds.
+
+## Task 1.8

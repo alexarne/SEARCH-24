@@ -31,5 +31,28 @@ public class PostingsList {
     public void insert(PostingsEntry entry) {
         list.add(entry);
     }
+
+    // term:PostingsList
+    // PostingsList:    PostingsEntry1,PostingsEntry2,PostingsEntry3,...
+    // PostingsEntry:   docID=pos1;pos2;pos3;...
+    // Final:           docID1=pos1;pos2;pos3;...,docID2=pos1;pos2;pos3;...>...
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+        for (PostingsEntry entry : list) {
+            str.append(entry.toString());
+            str.append(",");
+        }
+        str.deleteCharAt(str.length() - 1);
+        return str.toString();
+    }
+
+    public PostingsList() {}
+
+    public PostingsList(String data) {
+        String[] entries = data.split(",");
+        for (String entry : entries) {
+            insert(new PostingsEntry(entry));
+        }
+    }
 }
 
