@@ -75,6 +75,7 @@ public class PersistentHashedIndex implements Index {
     }
 
     int ENTRY_SIZE = 12;        // 12 bytes per entry (long + int)
+    long total_tokens = 0;
 
 
     // ==================================================================
@@ -324,12 +325,12 @@ public class PersistentHashedIndex implements Index {
      *  Write index to file after indexing is done.
      */
     public void cleanup() {
-        System.err.println( index.keySet().size() + " unique words" );
+        System.err.println(index.keySet().size() + " unique words" );
         System.err.print( "Writing index to disk..." );
         long startTime = System.currentTimeMillis();
         writeIndex();
         System.err.println( "done!" );
         long elapsedTime = System.currentTimeMillis() - startTime;
-        System.out.println(String.format( "Took %.1f seconds.", elapsedTime/1000.0 ));
+        System.err.println(String.format( "Took %.1f seconds.", elapsedTime/1000.0 ));
     }
 }
