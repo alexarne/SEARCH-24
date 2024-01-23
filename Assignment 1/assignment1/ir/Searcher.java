@@ -50,12 +50,12 @@ public class Searcher {
         // If query is empty, return empty
         if (query.size() == 0) return result;
 
+        // Sort in order of increasing length (Seems to be marginally slower, though)
+        Arrays.sort(lists, (PostingsList a, PostingsList b) -> a.size() - b.size());
+
         switch (queryType) {
             case INTERSECTION_QUERY:
-                // // Sort in order of increasing length (Seems to be marginally slower, though)
-                // Arrays.sort(lists, (PostingsList a, PostingsList b) -> a.size() - b.size());
-
-                // Intersect
+            // Intersect
                 result = lists[0];
                 for (int i = 1; i < query.size(); ++i) {
                     result = intersect(result, lists[i]);
