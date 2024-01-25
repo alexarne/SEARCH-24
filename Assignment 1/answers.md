@@ -1,8 +1,8 @@
 ## Task 1.1
 
-`compile_all.bat && run_tokenizer.bat`
+Windows CMD: `compile_all.bat && run_tokenizer.bat`
 
-`diff tokenized_result.txt token_test_tokenized_ok.txt`
+WSL Ubuntu: `diff tokenized_result.txt token_test_tokenized_ok.txt`
 
 ## Task 1.3
 

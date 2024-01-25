@@ -39,10 +39,11 @@ https?:\/\/.+
 // Dollar amounts (e.g. $80)
 \$\d+
 
-// Combined words (e.g. can't), allow
+// Combined words (e.g. can't)
 \w+'\w+
 // Allow apostrophe at the beginning if not also at the end (e.g. 'em but not 'gaffe')
-'\w+\Z
+//'\w+\Z
+'em
 
 // Time clock (e.g. 18:15:34)
 (\d+:)+\d+
@@ -60,7 +61,7 @@ https?:\/\/.+
 (\w+\.){2,}
 
 // File extensions (e.g. cake.ppt)
-\w+\.\w+
+\w+\.(ppt|doc|xlsx|jpg|jpeg|png|docx|txt)
 
 
 

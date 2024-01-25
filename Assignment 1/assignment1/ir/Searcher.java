@@ -38,7 +38,7 @@ public class Searcher {
         //  REPLACE THE STATEMENT BELOW WITH YOUR CODE
         //
         PostingsList result = new PostingsList();
-
+        
         // Fetch all postings lists
         PostingsList[] lists = new PostingsList[query.size()];
         for (int i = 0; i < query.size(); ++i) {
