@@ -33,6 +33,9 @@ https?:\/\/.+
 (\d+-)+\d+
 \+\d+
 
+// Combined words (e.g. fully-qualified-person)
+(\w+-)+\w+
+
 // "Marked" numbers (e.g. 7,919,900)
 (\d+,)+\d+
 
@@ -50,9 +53,6 @@ https?:\/\/.+
 
 // Twenty-four seven
 \d+/\d+
-
-// Combined words (e.g. fully-qualified)
-\w+-\w+
 
 // Section digits (e.g. 2.4.1), IP numbers (e.g. 192.168.255.255)
 (\d+\.)+\d+

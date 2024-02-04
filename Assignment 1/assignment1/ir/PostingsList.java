@@ -8,12 +8,12 @@
 package ir;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class PostingsList {
     
     /** The postings list */
     private ArrayList<PostingsEntry> list = new ArrayList<PostingsEntry>();
-
 
     /** Number of postings in this list. */
     public int size() {
@@ -50,8 +50,9 @@ public class PostingsList {
 
     public PostingsList(String data) {
         String[] entries = data.split(",");
-        for (String entry : entries) {
-            insert(new PostingsEntry(entry));
+        list = new ArrayList<>(Collections.nCopies(entries.length, null));
+        for (int i = 0; i < entries.length; ++i) {
+            list.set(i, new PostingsEntry(entries[i]));
         }
     }
 }

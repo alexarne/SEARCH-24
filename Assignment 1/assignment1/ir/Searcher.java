@@ -7,8 +7,11 @@
 
 package ir;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import ir.Query.QueryTerm;
 
@@ -37,6 +40,8 @@ public class Searcher {
         //
         //  REPLACE THE STATEMENT BELOW WITH YOUR CODE
         //
+        System.out.println("Begin search:");
+        long startTime = System.currentTimeMillis();
         PostingsList result = new PostingsList();
         
         // Fetch all postings lists
@@ -46,6 +51,9 @@ public class Searcher {
             // Replace null with empty PostingsList for simplicity
             if (lists[i] == null) lists[i] = new PostingsList();
         }
+        long elapsedTime = System.currentTimeMillis() - startTime;
+        startTime = System.currentTimeMillis();
+        System.out.println("Read lists: " + elapsedTime + " ms");
 
         // If query is empty, return empty
         if (query.size() == 0) return result;
@@ -77,6 +85,22 @@ public class Searcher {
             default:
                 break;
         }
+        elapsedTime = System.currentTimeMillis() - startTime;
+        startTime = System.currentTimeMillis();
+        System.out.println("Intersect: " + elapsedTime + " ms");
+
+        // try {
+        //     FileWriter fw = new FileWriter("./compare.txt");
+        //     for (int i = 0; i < result.size(); ++i) {
+        //         fw.write(index.docNames.get(result.get(i).docID));
+        //         fw.write("\n");
+        //     }
+        //     fw.close();
+        // } catch (IOException e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // }
+        
         return result;
     }
 
@@ -105,8 +129,8 @@ public class Searcher {
         while (i1 < p1.size() && i2 < p2.size()) {
             if (p1.get(i1).docID == p2.get(i2).docID) {
                 // Exist in same doc, check for positional relation
-                ArrayList<Integer> positions1 = p1.get(i1).occurrences;
-                ArrayList<Integer> positions2 = p2.get(i2).occurrences;
+                ArrayList<Integer> positions1 = p1.get(i1).getOccurrences();
+                ArrayList<Integer> positions2 = p2.get(i2).getOccurrences();
                 ArrayList<Integer> aligned_positions = new ArrayList<>();
                 for (Integer pos1 : positions1) {
                     for (Integer pos2 : positions2) {
@@ -116,7 +140,7 @@ public class Searcher {
                 }
                 if (aligned_positions.size() > 0) {
                     PostingsEntry entry = new PostingsEntry(p1.get(i1).docID);
-                    entry.occurrences = aligned_positions;
+                    entry.setOccurrences(aligned_positions);
                     result.insert(entry);
                 }
                 ++i1;

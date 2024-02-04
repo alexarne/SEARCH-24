@@ -525,13 +525,24 @@ public class PersistentScalableHashedIndex implements Index {
         //
         //  REPLACE THE STATEMENT BELOW WITH YOUR CODE
         //
+        long startTime = System.currentTimeMillis();
+        int collisions = 0;
 
         long hash = hash(token);
         while (entryExists(hash)) {
             Entry entry = readEntry(hash * ENTRY_SIZE);
             String[] data = readData(entry.ptr, entry.size).split(" ");
-            if (data[0].equals(token)) return new PostingsList(data[1].trim());
-
+            if (data[0].equals(token)) {
+                long startTime2 = System.currentTimeMillis();
+                PostingsList list = new PostingsList(data[1].trim());
+                long elapsedTime = System.currentTimeMillis() - startTime;
+                long elapsedTime2 = System.currentTimeMillis() - startTime2;
+                System.out.println("Found list for '" + token + "': " + elapsedTime + " ms");
+                System.out.println("Collisions: " + collisions);
+                System.out.println("Parsing time: " + elapsedTime2 + " ms");
+                return list;
+            }
+            collisions++;
             // Try next slot
             ++hash;
         }
