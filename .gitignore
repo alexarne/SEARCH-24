@@ -23,7 +23,7 @@
 hs_err_pid*
 replay_pid*
 
-Assignment*1/assignment*/index/
-Assignment*1/assignment*/index*-*cached/
+Assignment**/assignment*/index/
+Assignment**/assignment*/index*-*cached/
 davisWiki/
 guardian/
