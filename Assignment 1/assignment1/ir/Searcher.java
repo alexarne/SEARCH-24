@@ -60,8 +60,8 @@ public class Searcher {
         
         switch (queryType) {
             case INTERSECTION_QUERY:
-                // Sort in order of increasing length (Seems to be marginally slower, though)
-                Arrays.sort(lists, (PostingsList a, PostingsList b) -> a.size() - b.size());
+                // // Sort in order of increasing length (Seems to be marginally slower, though)
+                // Arrays.sort(lists, (PostingsList a, PostingsList b) -> a.size() - b.size());
                 
                 // Intersect
                 result = lists[0];

@@ -42,6 +42,7 @@ public class PersistentScalableHashedIndex implements Index {
 
     /** The dictionary hash table on disk can fit this many entries. */
     public static final long TABLESIZE = 3_500_017L;
+    // public static final long TABLESIZE = 611953L;
 
     /** The dictionary hash table is stored in this file. */
     RandomAccessFile dictionaryFile;
@@ -79,6 +80,7 @@ public class PersistentScalableHashedIndex implements Index {
     // Total tokens (guardian): 57_663_287
     int token_count = 0;
     int TOKEN_LIMIT = 10_000_000;
+    // int TOKEN_LIMIT = 1_000_000;
     int previous_docID = -1;
 
     int intermediary_number = 0;
