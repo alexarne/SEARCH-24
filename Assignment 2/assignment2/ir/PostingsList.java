@@ -8,12 +8,15 @@
 package ir;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class PostingsList {
     
     /** The postings list */
     private ArrayList<PostingsEntry> list = new ArrayList<PostingsEntry>();
+    private HashMap<Integer, PostingsEntry> map = new HashMap<>();
 
     /** Number of postings in this list. */
     public int size() {
@@ -30,6 +33,11 @@ public class PostingsList {
     //
     public void insert(PostingsEntry entry) {
         list.add(entry);
+        map.put(entry.docID, entry);
+    }
+
+    public PostingsEntry getByDocID(int docID) {
+        return map.get(docID);
     }
 
     // term:PostingsList
@@ -54,6 +62,10 @@ public class PostingsList {
         for (int i = 0; i < entries.length; ++i) {
             list.set(i, new PostingsEntry(entries[i]));
         }
+    }
+
+    public void sort() {
+        Collections.sort(list);
     }
 }
 

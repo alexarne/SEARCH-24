@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 
 import ir.Query.QueryTerm;
 
@@ -55,6 +56,7 @@ public class Searcher {
         
         switch (queryType) {
             case INTERSECTION_QUERY:
+                System.out.println("Intersection query");
                 // // Sort in order of increasing length (Seems to be marginally slower, though)
                 // Arrays.sort(lists, (PostingsList a, PostingsList b) -> a.size() - b.size());
                 
@@ -66,6 +68,7 @@ public class Searcher {
 
                 break;
             case PHRASE_QUERY:
+                System.out.println("Phrase query");
 
                 result = lists[0];
                 for (int i = 1; i < query.size(); ++i) {
@@ -74,8 +77,13 @@ public class Searcher {
 
                 break;
             case RANKED_QUERY:
+                System.out.println("Ranked query");
                 
-                
+                result = lists[0];
+                for (int i = 1; i < query.size(); ++i) {
+                    result = union(result, lists[i]);
+                }
+                result = cosineRank(result, query);
 
                 break;
         
@@ -83,6 +91,40 @@ public class Searcher {
                 break;
         }
         
+        return result;
+    }
+
+    public PostingsList union(PostingsList p1, PostingsList p2) {
+        for (int i = 0; i < p2.size(); ++i) {
+            p1.insert(p2.get(i));
+        }
+        return p1;
+    }
+
+    public PostingsList cosineRank(PostingsList p, Query query) {
+        PostingsList result = new PostingsList();
+        double N = index.docNames.size();
+        for (QueryTerm t : query.queryterm) {
+            PostingsList pl = index.getPostings(t.term);
+            // Assumes unique terms in query
+            double w_tq = 1;
+            double idf_t = Math.log(N / pl.size());
+            for (int i = 0; i < pl.size(); ++i) {
+                int d = pl.get(i).docID;
+                int len_d = index.docLengths.get(d);
+                double tf_dt = pl.get(i).getOccurrences().size();
+                double w_td = tf_dt * idf_t;
+                if (result.getByDocID(d) == null) result.insert(new PostingsEntry(d));
+                result.getByDocID(d).score += w_td * w_tq / len_d;
+            }
+        }
+        result.sort();
+        for (int i = 0;  i < result.size(); ++i) {
+            // System.out.println(index.docNames.get(result.get(i).docID));
+            if (index.docNames.get(result.get(i).docID).equals("..\\..\\davisWiki\\Davis_Funeral_Chapel.f")) {
+                System.out.println("pos " + i);
+            }
+        }
         return result;
     }
 

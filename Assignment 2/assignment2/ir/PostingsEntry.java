@@ -29,6 +29,7 @@ public class PostingsEntry implements Comparable<PostingsEntry>, Serializable {
      *  The comparison is defined so that entries will be put in 
      *  descending order.
      */
+    @Override
     public int compareTo( PostingsEntry other ) {
        return Double.compare( other.score, score );
     }
@@ -91,6 +92,11 @@ public class PostingsEntry implements Comparable<PostingsEntry>, Serializable {
         // for (int i = 0; i < pos.length; ++i) {
         //     occurrences.set(i, Integer.valueOf(pos[i]));
         // }
+    }
+
+    public PostingsEntry(PostingsEntry entry) {
+        this.docID = entry.docID;
+        this.occurrences = entry.getOccurrences();
     }
 }
 
