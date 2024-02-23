@@ -118,4 +118,46 @@ Manhattan: (1*ln(17478/10312) * 1*ln(17478/10312)) / (2 * (1*ln(17478/1907) + 1*
 | Euclidean length, tf x idf | 0.0373  | 0.0161                 |
 | Manhattan length, tf x idf | 0.0060  | 0.0059                 |
 
-## Task 2.
+## Task 2.4
+
+The only one similar two similar to the intersection query from 1.5 are Elaine_Kasimatis.f and Evelyn_Silvia.f.
+
+The ranked retrieval only returns very short documents.
+
+Difficult cases (generally all redirects are tricky):
+
+```
+1 Math.f 2 - is a redirect to a relevant page considered relevant? perhaps...
+1 Grad_Students.f 0 - would probably be relevant if i took the target page (Graduate Students) into consideration
+1 EfremRensi.f 1 - same as assignment 1, are graduates relevant?
+```
+
+```
+top10, relevant and returned: 3
+top20, relevant and returned: 3
+top30, relevant and returned: 7
+top40, relevant and returned: 10
+top50, relevant and returned: 13
+```
+
+|        | **Precision** | **Recall**    |
+| ------ | ------------- | ------------- |
+| **10** | 3/10 = 0.30   | 3/100 = 0.03  |
+| **20** | 3/20 = 0.15   | 3/100 = 0.03  |
+| **30** | 7/30 = 0.23   | 7/100 = 0.07  |
+| **40** | 10/40 = 0.25  | 10/100 = 0.10 |
+| **50** | 13/50 = 0.26  | 13/100 = 0.13 |
+
+![](./precision-recall-graph.png)
+
+**Which precision is the highest? Are there any trends?**
+
+Highest for top10 results, then it shoots down and starts climbing back up but never reaching past the precision for top10.
+
+**Which recall is the highest? Is there any relation between precision at 10, 20, 30, 40, 50, and recall at 10, 20, 30, 40, 50?**
+
+Recall is obviously highest when we consider the most amount of documents in our returned result, which is for top50.
+
+The relation is that precision perhaps starts to flatline at around 0.25 while recall increases the more documents are considered.
+
+## Task 2.5

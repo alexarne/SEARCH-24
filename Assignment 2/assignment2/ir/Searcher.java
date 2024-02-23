@@ -119,12 +119,6 @@ public class Searcher {
             }
         }
         result.sort();
-        for (int i = 0;  i < result.size(); ++i) {
-            // System.out.println(index.docNames.get(result.get(i).docID));
-            if (index.docNames.get(result.get(i).docID).equals("..\\..\\davisWiki\\Davis_Funeral_Chapel.f")) {
-                System.out.println("pos " + i);
-            }
-        }
         return result;
     }
 
