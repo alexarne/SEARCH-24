@@ -8,7 +8,14 @@
 package ir;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  *  This is the main class for the search engine.
@@ -73,6 +80,8 @@ public class Engine {
         searcher = new Searcher( index, kgIndex );
         gui = new SearchGUI( this );
         gui.init();
+        boolean calculate_euclideans = !(new File("./index/euclideans.txt").exists());
+        if (!calculate_euclideans) loadEuclideanLengths();
         /* 
          *   Calls the indexer to index the chosen directory structure.
          *   Access to the index is synchronized since we don't want to 
@@ -85,14 +94,83 @@ public class Engine {
                 long startTime = System.currentTimeMillis();
                 for ( int i=0; i<dirNames.size(); i++ ) {
                     File dokDir = new File( dirNames.get( i ));
-                    indexer.processFiles( dokDir, is_indexing );
+                    indexer.processFiles( dokDir, is_indexing, calculate_euclideans );
                 }
+                loadPageRank();
                 long elapsedTime = System.currentTimeMillis() - startTime;
-                gui.displayInfoText( String.format( "Indexing done in %.1f seconds.", elapsedTime/1000.0 ));
                 index.cleanup();
+                if (calculate_euclideans) calculateEuclideanLengths();
+                gui.displayInfoText( String.format( "Indexing done in %.1f seconds.", elapsedTime/1000.0 ));
             }
         } else {
+            loadPageRank();
             gui.displayInfoText( "Index is loaded from disk" );
+        }
+    }
+
+    public void loadPageRank() {
+        HashMap<String, String> nameToPageRank = new HashMap<>();
+        try {
+            BufferedReader in = new BufferedReader( new FileReader("./index/pagerank.txt"));
+            String line;
+            while ((line = in.readLine()) != null) {
+                String[] arr = line.split(" ");
+                nameToPageRank.put(arr[0], arr[1]);
+            }
+            in.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        for (Integer id : index.docNames.keySet()) {
+            String[] arr = index.docNames.get(id).split("\\\\");
+            String filename = arr[arr.length-1];
+            index.docPageRank.put(id, Double.parseDouble(nameToPageRank.get(filename)));
+        }
+    }
+
+    public void loadEuclideanLengths() {
+        try {
+            BufferedReader in = new BufferedReader( new FileReader("./index/euclideans.txt"));
+            String line;
+            while ((line = in.readLine()) != null) {
+                String[] arr = line.split(" ");
+                Integer doc = Integer.valueOf(arr[0]);
+                Double length = Double.parseDouble(arr[1]);
+                index.docLengthsEuclidean.put(doc, length);
+            }
+            in.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void calculateEuclideanLengths() {
+        try {
+            FileWriter fw = new FileWriter("./index/euclideans.txt", true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            for (int i = 0; i < index.tf_vector.size(); ++i) {
+                if (i % 1000 == 0) System.out.println(i);
+                System.out.println("tf vector size " + index.tf_vector.get(i).size());
+                double norm2 = 0;
+                for (String term : index.tf_vector.get(i).keySet()) {
+                    System.out.println("term "+ term);
+                    PostingsList pl = index.getPostings(term);
+                    double N = index.docNames.size();
+                    double idf_t = Math.log(N / pl.size());
+                    int tf_dt = index.tf_vector.get(i).get(term);
+                    norm2 += (tf_dt * idf_t) * (tf_dt * idf_t);
+                }
+                index.docLengthsEuclidean.put(i, Math.sqrt(norm2));
+                bw.write(i + " " + index.docLengthsEuclidean.get(i));
+                bw.newLine();
+            }
+            bw.close();
+            fw.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 

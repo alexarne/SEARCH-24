@@ -52,7 +52,7 @@ public class Indexer {
      *  Tokenizes and indexes the file @code{f}. If <code>f</code> is a directory,
      *  all its files and subdirectories are recursively processed.
      */
-    public void processFiles( File f, boolean is_indexing ) {
+    public void processFiles( File f, boolean is_indexing, boolean calculate_euclideans ) {
         // do not try to index fs that cannot be read
         if (is_indexing) {
             if ( f.canRead() ) {
@@ -61,10 +61,11 @@ public class Indexer {
                     // an IO error could occur
                     if ( fs != null ) {
                         for ( int i=0; i<fs.length; i++ ) {
-                            processFiles( new File( f, fs[i] ), is_indexing );
+                            processFiles( new File( f, fs[i] ), is_indexing, calculate_euclideans );
                         }
                     }
                 } else {
+                    index.tf_vector.add(new HashMap<>());
                     // First register the document and get a docID
                     int docID = generateDocID();
                     if ( docID%1000 == 0 ) System.err.println( "Indexed " + docID + " files" );
@@ -75,6 +76,10 @@ public class Indexer {
                         while ( tok.hasMoreTokens() ) {
                             String token = tok.nextToken();
                             insertIntoIndex( docID, token, offset++ );
+                            if (calculate_euclideans) {
+                                if (index.tf_vector.get(docID).get(token) == null) index.tf_vector.get(docID).put(token, 0);
+                                index.tf_vector.get(docID).merge(token, 1, Integer::sum);
+                            }
                         }
                         index.docNames.put( docID, f.getPath() );
                         index.docLengths.put( docID, offset );

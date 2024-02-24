@@ -161,3 +161,27 @@ Recall is obviously highest when we consider the most amount of documents in our
 The relation is that precision perhaps starts to flatline at around 0.25 while recall increases the more documents are considered.
 
 ## Task 2.5
+
+![](./pagerank-optimization.png)
+
+Edited the pagerank file, added the pagerank loader to the Engine file, and used that pagerank mapping in the Searcher file for combining in search.
+
+**Look up the titles of some documents with high rank, and some documents with low rank. Does the ranking make sense?**
+
+```
+245: 0.01253164114193445 - UC_Davis.f
+121: 0.012095036645627017 - Davis.f
+...
+16: 0.0014464177187003574 - 2004.f
+484: 0.0014457534622735054 - Winters.f
+```
+
+The rankings make sense, it is to be expected that pages which are central to Davis should be linked to a lot, and therefore have a high PageRank. Perhaps 2004.f is a yearly review or something, which is why it is less linked to but still somewhat prevalent. And the same for Winters.f.
+
+**What is the effect of letting the tf_idf score dominate this ranking? What is the effect of letting the pagerank dominate? What would be a good strategy for selecting an ”optimal” combination? (Remember the quality measures you studied in Task 2.3.)**
+
+Similarity (which is a bit unreliable) vs. credibility/reputation.
+
+# Task 2.6
+
+Added function to load the file with Euclidean lengths in Engine and added the calculator in Indexer.

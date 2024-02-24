@@ -83,7 +83,20 @@ public class Searcher {
                 for (int i = 1; i < query.size(); ++i) {
                     result = union(result, lists[i]);
                 }
-                result = cosineRank(result, query);
+                switch (rankingType) {
+                    case RankingType.TF_IDF:
+                        result = cosineRank(result, query, 0);
+                        break;
+                    case RankingType.PAGERANK:
+                        result = cosineRank(result, query, 1);
+                        break;
+                    case RankingType.COMBINATION:
+                        double pageRankWeight = 0.95;
+                        result = cosineRank(result, query, pageRankWeight);
+                        break;
+                    default:
+                        break;
+                }
 
                 break;
         
@@ -101,7 +114,7 @@ public class Searcher {
         return p1;
     }
 
-    public PostingsList cosineRank(PostingsList p, Query query) {
+    public PostingsList cosineRank(PostingsList p, Query query, double pageRankWeight) {
         PostingsList result = new PostingsList();
         double N = index.docNames.size();
         for (QueryTerm t : query.queryterm) {
@@ -111,12 +124,18 @@ public class Searcher {
             double idf_t = Math.log(N / pl.size());
             for (int i = 0; i < pl.size(); ++i) {
                 int d = pl.get(i).docID;
-                int len_d = index.docLengths.get(d);
+                // int len_d = index.docLengths.get(d);
+                double len_d = index.docLengthsEuclidean.get(d);
                 double tf_dt = pl.get(i).getOccurrences().size();
                 double w_td = tf_dt * idf_t;
                 if (result.getByDocID(d) == null) result.insert(new PostingsEntry(d));
                 result.getByDocID(d).score += w_td * w_tq / len_d;
             }
+        }
+        for (int i = 0; i < result.size(); ++i) {
+            double tf_idf = result.get(i).score;
+            double pagerank = index.docPageRank.get(result.get(i).docID);
+            result.get(i).score = (1-pageRankWeight) * tf_idf + pageRankWeight * pagerank;
         }
         result.sort();
         return result;

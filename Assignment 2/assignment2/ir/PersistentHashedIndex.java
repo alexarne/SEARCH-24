@@ -271,7 +271,7 @@ public class PersistentHashedIndex implements Index {
         //
         //  REPLACE THE STATEMENT BELOW WITH YOUR CODE
         //
-
+        
         long hash = hash(token);
         while (entryExists(hash)) {
             Entry entry = readEntry(hash * ENTRY_SIZE);

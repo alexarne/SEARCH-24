@@ -7,6 +7,7 @@
 
 package ir;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -31,5 +32,15 @@ public interface Index {
     /** This method is called on exit. */
     public void cleanup();
 
+
+
+    /** Mapping from document identifier to its pagerank value */
+    public HashMap<Integer, Double> docPageRank = new HashMap<>();
+    
+    /** Mapping from document identifier to document (Euclidean) length */
+    public HashMap<Integer, Double> docLengthsEuclidean = new HashMap<Integer, Double>();
+
+    /** Intermediary helper for Euclidean lengths */
+    public ArrayList<HashMap<String, Integer>> tf_vector = new ArrayList<>();
 }
 
