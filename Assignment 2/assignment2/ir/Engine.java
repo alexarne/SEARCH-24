@@ -99,7 +99,10 @@ public class Engine {
                 loadPageRank();
                 long elapsedTime = System.currentTimeMillis() - startTime;
                 index.cleanup();
-                if (calculate_euclideans) calculateEuclideanLengths();
+                if (calculate_euclideans) {
+                    calculateEuclideanLengths();
+                    writeEuclideanLengths();
+                }
                 gui.displayInfoText( String.format( "Indexing done in %.1f seconds.", elapsedTime/1000.0 ));
             }
         } else {
@@ -147,23 +150,26 @@ public class Engine {
     }
 
     public void calculateEuclideanLengths() {
+        double N = index.docNames.size();
+        for (int i = 0; i < index.tf_vector.size(); ++i) {
+            if (i % 1000 == 0) System.out.println(i);
+            double norm2 = 0;
+            for (String term : index.tf_vector.get(i).keySet()) {
+                int tf = index.tf_vector.get(i).get(term);
+                double df = index.df_map.get(term);
+                double idf_t = Math.log(N / df);
+                norm2 += tf*idf_t * tf*idf_t;
+            }
+            index.docLengthsEuclidean.put(i, Math.sqrt(norm2));
+        }
+    }
+
+    public void writeEuclideanLengths() {
         try {
             FileWriter fw = new FileWriter("./index/euclideans.txt", true);
             BufferedWriter bw = new BufferedWriter(fw);
-            for (int i = 0; i < index.tf_vector.size(); ++i) {
-                if (i % 1000 == 0) System.out.println(i);
-                System.out.println("tf vector size " + index.tf_vector.get(i).size());
-                double norm2 = 0;
-                for (String term : index.tf_vector.get(i).keySet()) {
-                    System.out.println("term "+ term);
-                    PostingsList pl = index.getPostings(term);
-                    double N = index.docNames.size();
-                    double idf_t = Math.log(N / pl.size());
-                    int tf_dt = index.tf_vector.get(i).get(term);
-                    norm2 += (tf_dt * idf_t) * (tf_dt * idf_t);
-                }
-                index.docLengthsEuclidean.put(i, Math.sqrt(norm2));
-                bw.write(i + " " + index.docLengthsEuclidean.get(i));
+            for (int docID : index.docLengthsEuclidean.keySet()) {
+                bw.write(docID + " " + index.docLengthsEuclidean.get(docID));
                 bw.newLine();
             }
             bw.close();

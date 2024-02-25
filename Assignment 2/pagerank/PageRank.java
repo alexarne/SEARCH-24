@@ -56,6 +56,8 @@ public class PageRank {
     public PageRank( String filename ) {
 		int noOfDocs = readDocs( filename );
 		iterate( noOfDocs, 1000 );
+		monteCarlo(noOfDocs, 1000);
+		svWiki();
     }
 
 
@@ -217,6 +219,232 @@ public class PageRank {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		exactPageRank = x;
+	}
+
+	Random rand = new Random();
+	double[] exactPageRank;
+	int[] visits;
+
+	public void monteCarlo(int numberOfDocs, int t) {
+		int cycles = 20;
+
+		System.out.println("\nMonte-Carlo 1:");
+		int simulations = 0;
+		int totalVisits = 0;
+		visits = new int[numberOfDocs];
+		for (int i = 0; i < cycles; ++i) {
+			totalVisits += mc1(numberOfDocs, t);
+			++simulations;
+			printGoodness(simulations, totalVisits);
+		}
+
+		System.out.println("\nMonte-Carlo 2:");
+		simulations = 0;
+		totalVisits = 0;
+		visits = new int[numberOfDocs];
+		for (int i = 0; i < cycles; ++i) {
+			totalVisits += mc2(numberOfDocs, t);
+			++simulations;
+			printGoodness(simulations, totalVisits);
+		}
+
+		System.out.println("\nMonte-Carlo 4:");
+		simulations = 0;
+		totalVisits = 0;
+		visits = new int[numberOfDocs];
+		for (int i = 0; i < cycles; ++i) {
+			totalVisits += mc4(numberOfDocs);
+			++simulations;
+			printGoodness(simulations, totalVisits);
+		}
+		// for (int i = 0; i < 30; ++i) {
+		// 	System.out.println(i + " " + (double) visits[i] / totalVisits);
+		// }
+
+		System.out.println("Top 30:");
+		double[] x = new double[numberOfDocs];
+		for (int i = 0; i < x.length; ++i) {
+			x[i] = (double) visits[i] / totalVisits;
+		}
+		Integer[] indeces = new Integer[numberOfDocs];
+		for (Integer i = 0; i < numberOfDocs; ++i)
+			indeces[i] = i;
+		Arrays.sort(indeces, new Comparator<Integer>() {
+			@Override
+			public int compare(Integer a, Integer b) {
+			  return x[a] < x[b] ? 1 : x[a] == x[b] ? 0 : -1;
+			}
+		  }
+		);
+		for (int i = 0; i < 30; ++i) {
+			System.out.println(docName[indeces[i]] + ": " + x[indeces[i]]);
+		}
+
+		System.out.println("\nMonte-Carlo 5:");
+		simulations = 0;
+		totalVisits = 0;
+		visits = new int[numberOfDocs];
+		for (int i = 0; i < cycles; ++i) {
+			totalVisits += mc5(numberOfDocs);
+			++simulations;
+			printGoodness(simulations, totalVisits);
+		}
+	}
+
+	public int mc1(int numberOfDocs, int t) {
+		int totalVisits	= 0;
+		for (int i = 0; i < numberOfDocs; ++i) {
+			int current = rand.nextInt(numberOfDocs);
+			int counter = 0;
+			while (counter < t) {
+				double p = rand.nextDouble();
+				if (p < BORED) break;
+				if (link.get(current) == null) {
+					current = rand.nextInt(numberOfDocs);
+				} else {
+					ArrayList<Integer> keys = new ArrayList<>(link.get(current).keySet());
+					current = keys.get(rand.nextInt(keys.size()));
+				}
+				++counter;
+			}
+			visits[current]++;
+			totalVisits++;
+		}
+		return totalVisits;
+	}
+
+	public int mc2(int numberOfDocs, int t) {
+		int totalVisits	= 0;
+		for (int i = 0; i < numberOfDocs; ++i) {
+			int current = i;
+			int counter = 0;
+			while (counter < t) {
+				double p = rand.nextDouble();
+				if (p < BORED) break;
+				if (link.get(current) == null) {
+					current = rand.nextInt(numberOfDocs);
+				} else {
+					ArrayList<Integer> keys = new ArrayList<>(link.get(current).keySet());
+					current = keys.get(rand.nextInt(keys.size()));
+				}
+				++counter;
+			}
+			visits[current]++;
+			totalVisits++;
+		}
+		return totalVisits;
+	}
+
+	public int mc4(int numberOfDocs) {
+		int totalVisits = 0;
+		for (int i = 0; i < numberOfDocs; ++i) {
+			int current = i;
+			while (true) {
+				++totalVisits;
+				visits[current]++;
+				double p = rand.nextDouble();
+				if (p < BORED) break;
+				if (link.get(current) == null) break;
+				ArrayList<Integer> keys = new ArrayList<>(link.get(current).keySet());
+				current = keys.get(rand.nextInt(keys.size()));
+			}
+		}
+		return totalVisits;
+	}
+
+	public int mc5(int numberOfDocs) {
+		int totalVisits = 0;
+		for (int i = 0; i < numberOfDocs; ++i) {
+			int current = rand.nextInt(numberOfDocs);
+			while (true) {
+				++totalVisits;
+				visits[current]++;
+				double p = rand.nextDouble();
+				if (p < BORED) break;
+				if (link.get(current) == null) break;
+				ArrayList<Integer> keys = new ArrayList<>(link.get(current).keySet());
+				current = keys.get(rand.nextInt(keys.size()));
+			}
+		}
+		return totalVisits;
+	}
+
+	public void printGoodness(int simulations, int totalVisits) {
+		double sum = 0; 
+		for (int i = 0; i < visits.length; ++i) {
+			double estimatedPageRank = (double) visits[i] / totalVisits;
+			double delta = estimatedPageRank - exactPageRank[i];
+			sum += delta*delta;
+		}
+		System.out.println("[" + simulations + ", " + sum + "],");
+	}
+
+	public void svWiki() {
+		docNumber = new HashMap<String,Integer>();
+		docName = new String[MAX_NUMBER_OF_DOCS];
+		link = new HashMap<Integer,HashMap<Integer,Boolean>>();
+		int numberOfDocs = readDocs("linksSvwiki.txt");
+		int totalVisits = 0;
+		double[] x = new double[numberOfDocs];
+		double[] xp = new double[numberOfDocs];
+		Integer[] indeces = new Integer[numberOfDocs];
+		for (Integer i = 0; i < numberOfDocs; ++i)
+			indeces[i] = i;
+		Integer[] indecesp = indeces.clone();
+
+		visits = new int[numberOfDocs];
+		while (true) {
+			totalVisits += mc4(numberOfDocs);
+
+			xp = x.clone();
+			for (int i = 0; i < x.length; ++i) {
+				x[i] = (double) visits[i] / totalVisits;
+			}
+			indecesp = indeces.clone();
+			Arrays.sort(indeces, new Comparator<Integer>() {
+				@Override
+				public int compare(Integer a, Integer b) {
+				return x[a] < x[b] ? 1 : x[a] == x[b] ? 0 : -1;
+				}
+			}
+			);
+			double norm2 = 0;
+			for (int i = 0; i < 30; ++i) {
+				double delta = x[indeces[i]] - xp[indeces[i]];
+				norm2 += delta*delta;
+			}
+			boolean stable = true;
+			for (int i = 0; i < 30; ++i) {
+				stable = stable && indeces[i] == indecesp[i];
+			}
+			System.out.println("norm2: " + norm2 + ", top30 stable: " + stable);
+
+			if (norm2 < 1e-10 && stable) {
+				System.out.println("Top30:");
+				for (int i = 0; i < 30; ++i) {
+					System.out.println(docName[indeces[i]] + ": " + x[indeces[i]]);
+				}
+				System.out.println();
+				try {
+					HashMap<String, String> realName = new HashMap<>();
+					BufferedReader in = new BufferedReader( new FileReader("./svwikiTitles.txt"));
+					String line;
+					while ((line = in.readLine()) != null) {
+						String[] arr = line.split(";");
+						realName.put(arr[0], arr[1]);
+					}
+					in.close();
+					for (int i = 0; i < 30; ++i) {
+						System.out.println(realName.get(docName[indeces[i]]) + " " + x[indeces[i]]);
+					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				break;
+			}
+		}
 	}
 
 
@@ -224,11 +452,11 @@ public class PageRank {
 
 
     public static void main( String[] args ) {
-	if ( args.length != 1 ) {
-	    System.err.println( "Please give the name of the link file" );
-	}
-	else {
-	    new PageRank( args[0] );
-	}
+		if ( args.length != 1 ) {
+			System.err.println( "Please give the name of the link file" );
+		}
+		else {
+			new PageRank( args[0] );
+		}
     }
 }

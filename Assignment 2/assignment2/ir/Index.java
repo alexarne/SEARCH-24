@@ -42,5 +42,6 @@ public interface Index {
 
     /** Intermediary helper for Euclidean lengths */
     public ArrayList<HashMap<String, Integer>> tf_vector = new ArrayList<>();
+    public HashMap<String, Integer> df_map = new HashMap<>();
 }
 
