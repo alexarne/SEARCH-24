@@ -86,6 +86,7 @@ public class Indexer {
                             }
                         }
                         index.docNames.put( docID, f.getPath() );
+                        index.docIDs.put( f.getPath(), docID );
                         index.docLengths.put( docID, offset );
                         reader.close();
                     } catch ( IOException e ) {

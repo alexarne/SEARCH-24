@@ -348,3 +348,5 @@ Kategori:Natur 0.0010823277685194927
 ```
 
 ## Task 2.8
+
+`javac -cp . -d classes ir/HITSRanker.java && java -cp classes ir.HITSRanker ../pagerank/linksDavis.txt ../pagerank/davisTitles.txt`
