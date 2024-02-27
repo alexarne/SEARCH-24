@@ -213,8 +213,9 @@ public class PersistentHashedIndex implements Index {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(";");
-                docNames.put( new Integer(data[0]), data[1] );
-                docLengths.put( new Integer(data[0]), new Integer(data[2]) );
+                docNames.put( Integer.valueOf(data[0]), data[1] );
+                docIDs.put( data[1], Integer.valueOf(data[0]) );
+                docLengths.put( Integer.valueOf(data[0]), Integer.valueOf(data[2]) );
             }
         }
         freader.close();

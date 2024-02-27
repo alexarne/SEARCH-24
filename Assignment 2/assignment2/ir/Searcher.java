@@ -83,6 +83,7 @@ public class Searcher {
                 for (int i = 1; i < query.size(); ++i) {
                     result = union(result, lists[i]);
                 }
+                if (result.size() == 0) break; 
                 switch (rankingType) {
                     case RankingType.TF_IDF:
                         result = cosineRank(result, query, 0);
@@ -94,6 +95,9 @@ public class Searcher {
                         double pageRankWeight = 0.95;
                         result = cosineRank(result, query, pageRankWeight);
                         break;
+                    case RankingType.HITS:
+                        System.out.println("HITS");
+                        result = hits.rank(result);
                     default:
                         break;
                 }
@@ -106,6 +110,12 @@ public class Searcher {
         
         return result;
     }
+
+    HITSRanker hits = new HITSRanker(
+        "../pagerank/linksDavis.txt", 
+        "../pagerank/davisTitles.txt", 
+        index
+    );
 
     public PostingsList union(PostingsList p1, PostingsList p2) {
         for (int i = 0; i < p2.size(); ++i) {

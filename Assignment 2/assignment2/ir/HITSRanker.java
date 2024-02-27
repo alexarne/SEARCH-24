@@ -22,7 +22,8 @@ public class HITSRanker {
      *   Convergence criterion: hub and authority scores do not 
      *   change more that EPSILON from one iteration to another.
      */
-    final static double EPSILON = 0.001;
+    // final static double EPSILON = 0.001;
+    final static double EPSILON = 1e-17;
 
     /**
      *   The inverted index
@@ -141,33 +142,29 @@ public class HITSRanker {
         //
         // YOUR CODE HERE
         //
-		int fileIndex = 0;
+        
 		try {
 			System.err.print( "Reading file... " );
-			BufferedReader in = new BufferedReader( new FileReader( linksFilename ));
-			String line;
-			while ((line = in.readLine()) != null && fileIndex<MAX_NUMBER_OF_DOCS ) {
+            BufferedReader in = new BufferedReader( new FileReader( titlesFilename ));
+            String line;
+			while ((line = in.readLine()) != null) {
+                String[] arr = line.split( ";" );
+                titleToId.put(arr[1], Integer.valueOf(arr[0]));
+                idToTitle.put(Integer.valueOf(arr[0]), arr[1]);
+			}
+            in.close();
+            in = new BufferedReader( new FileReader( linksFilename ));
+			while ((line = in.readLine()) != null) {
 				int index = line.indexOf( ";" );
 				String title = line.substring( 0, index );
-				Integer fromdoc = docNumber.get( title );
-				//  Have we seen this document before?
-				if ( fromdoc == null ) {	
-					// This is a previously unseen doc, so add it to the table.
-					fromdoc = fileIndex++;
-					docNumber.put( title, fromdoc );
-					docName[fromdoc] = title;
-				}
+				Integer fromdoc = Integer.valueOf(title);
+                
 				// Check all outlinks.
 				StringTokenizer tok = new StringTokenizer( line.substring(index+1), "," );
-				while ( tok.hasMoreTokens() && fileIndex<MAX_NUMBER_OF_DOCS ) {
+				while ( tok.hasMoreTokens() ) {
 					String otherTitle = tok.nextToken();
-					Integer otherDoc = docNumber.get( otherTitle );
-					if ( otherDoc == null ) {
-						// This is a previousy unseen doc, so add it to the table.
-						otherDoc = fileIndex++;
-						docNumber.put( otherTitle, otherDoc );
-						docName[otherDoc] = otherTitle;
-					}
+					Integer otherDoc = Integer.valueOf(otherTitle);
+                    
 					// Set the probability to 0 for now, to indicate that there is
 					// a link from fromdoc to otherDoc.
 					if ( link.get(fromdoc) == null ) {
@@ -186,27 +183,14 @@ public class HITSRanker {
 				}
 			}
             in.close();
-            in = new BufferedReader( new FileReader( titlesFilename ));
-			while ((line = in.readLine()) != null && fileIndex<MAX_NUMBER_OF_DOCS ) {
-				String[] arr = line.split( ";" );
-                titleToId.put(arr[1], Integer.valueOf(arr[0]));
-                idToTitle.put(Integer.valueOf(arr[0]), arr[1]);
-			}
-            in.close();
 
-			if ( fileIndex >= MAX_NUMBER_OF_DOCS ) {
-				System.err.print( "stopped reading since documents table is full. " );
-			}
-			else {
-				System.err.print( "done. " );
-			}
+            System.err.println( "done. " );
 		} catch ( FileNotFoundException e ) {
 			System.err.println( "File " + linksFilename + " not found!" );
 		} catch ( IOException e ) {
 			System.err.println( "Error reading file " + linksFilename );
 		}
-		System.err.println( "Read " + fileIndex + " number of documents" );
-		return fileIndex;
+		return 0;
     }
 
     /**
@@ -222,6 +206,7 @@ public class HITSRanker {
         authorities = new HashMap<>();
 
         Integer[] baseSet = getBaseSet(titles);
+        System.out.println("Root size: " + titles.length + ", Base size: " + baseSet.length);
         for (int i = 0; i < baseSet.length; ++i) {
             hubs.put(baseSet[i], 1d);
             authorities.put(baseSet[i], 1d);
@@ -251,6 +236,7 @@ public class HITSRanker {
                     }
                 }
                 hubs.put(doc, value);
+                // System.out.println("hub of " + doc + " set to " + value);
             }
             
             Double norm2a = 0d, norm2h = 0d;
@@ -272,7 +258,7 @@ public class HITSRanker {
                 delta = authorities.get(doc) - authoritiesOld.get(doc);
                 norm2ad += delta*delta;
             }
-            System.out.println("norm2ad: " + norm2ad + " norm2hd: " + norm2hd);
+            // System.out.println("norm2ad: " + norm2ad + " norm2hd: " + norm2hd);
             if (norm2ad < EPSILON && norm2hd < EPSILON) break;
         }
     }
@@ -321,7 +307,7 @@ public class HITSRanker {
         PostingsList result = new PostingsList();
         HashMap<Integer, Double> combined = new HashMap<>();
         String filename = index.docNames.get(post.get(0).docID);
-        String prefix = filename.substring(0, filename.indexOf("\\")+1);
+        String prefix = filename.substring(0, filename.lastIndexOf("\\")+1);
         for (Integer localID : hubs.keySet()) {
             Integer docID = index.docIDs.get(prefix + idToTitle.get(localID));
             Double value = hubs.get(localID) + authorities.get(localID);
