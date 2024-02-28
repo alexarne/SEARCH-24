@@ -12,10 +12,14 @@ import java.util.HashMap;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 /**
  *  This is the main class for the search engine.
@@ -99,15 +103,17 @@ public class Engine {
                 loadPageRank();
                 long elapsedTime = System.currentTimeMillis() - startTime;
                 index.cleanup();
-                if (calculate_euclideans) {
-                    calculateEuclideanLengths();
-                    writeEuclideanLengths();
-                }
                 gui.displayInfoText( String.format( "Indexing done in %.1f seconds.", elapsedTime/1000.0 ));
             }
         } else {
             loadPageRank();
             gui.displayInfoText( "Index is loaded from disk" );
+        }
+        if (calculate_euclideans) {
+            System.out.println("calculating euclideans...");
+            calculateEuclideanLengths(new File( dirNames.get( 0 )));
+            System.out.println("calculation finished...");
+            writeEuclideanLengths();
         }
     }
 
@@ -149,22 +155,62 @@ public class Engine {
         }
     }
 
-    public void calculateEuclideanLengths() {
-        double N = index.docNames.size();
-        for (int i = 0; i < index.tf_vector.size(); ++i) {
-            if (i % 1000 == 0) System.out.println(i);
-            double norm2 = 0;
-            for (String term : index.tf_vector.get(i).keySet()) {
-                int tf = index.tf_vector.get(i).get(term);
-                double df = index.df_map.get(term);
-                double idf_t = Math.log(N / df);
-                norm2 += tf*idf_t * tf*idf_t;
+    private int localDocID = 0;
+    public void calculateEuclideanLengths(File f) {
+        if ( f.canRead() ) {
+            if ( f.isDirectory() ) {
+                String[] fs = f.list();
+                // an IO error could occur
+                if ( fs != null ) {
+                    for ( int i=0; i<fs.length; i++ ) {
+                        calculateEuclideanLengths( new File( f, fs[i] ) );
+                    }
+                }
+            } else {
+                // index.tf_vector.add(new HashMap<>());
+                HashMap<String, Integer> tf_vector = new HashMap<>();
+                // First register the document and get a docID
+                int docID = localDocID++;
+                if ( docID%1000 == 0 ) System.err.println( "Indexed " + docID + " files" );
+                try {
+                    Reader reader = new InputStreamReader( new FileInputStream(f), StandardCharsets.UTF_8 );
+                    Tokenizer tok = new Tokenizer( reader, true, false, true, patterns_file );
+                    int offset = 0;
+                    while ( tok.hasMoreTokens() ) {
+                        String token = tok.nextToken();
+                        if (tf_vector.get(token) == null) {
+                            tf_vector.put(token, 0);
+                        }
+                        tf_vector.merge(token, 1, Integer::sum);
+                    }
+                    reader.close();
+
+                    double N = index.docNames.size();
+                    double norm2 = 0;
+                    for (String term : tf_vector.keySet()) {
+                        int tf = tf_vector.get(term);
+                        double df = index.df_map.get(term);
+                        double idf_t = Math.log(N / df);
+                        norm2 += tf*idf_t * tf*idf_t;
+                    }
+                    index.docLengthsEuclidean.put(docID, Math.sqrt(norm2));
+                    // System.out.println(docID + " " + index.docNames.get(docID) + " : ");
+                    // for (String term : tf_vector.keySet()) {
+                    //     System.out.print(term + " " + tf_vector.get(term)+", ");
+                    // }
+                    // System.out.println();
+                    // System.out.println("n is " + N);
+
+
+                } catch ( IOException e ) {
+                    System.err.println( "Warning: IOException during indexing." );
+                }
             }
-            index.docLengthsEuclidean.put(i, Math.sqrt(norm2));
         }
     }
 
     public void writeEuclideanLengths() {
+        System.out.println("writing euclideans...");
         try {
             FileWriter fw = new FileWriter("./index/euclideans.txt", true);
             BufferedWriter bw = new BufferedWriter(fw);
@@ -178,6 +224,7 @@ public class Engine {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        System.out.println("writing finished...");
     }
 
 

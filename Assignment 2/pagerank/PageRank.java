@@ -292,6 +292,11 @@ public class PageRank {
 		}
 	}
 
+	/**
+	 * Random start point
+	 * Go until surfer is bored or max jumps
+	 * Mark the end point
+	 */
 	public int mc1(int numberOfDocs, int t) {
 		int totalVisits	= 0;
 		for (int i = 0; i < numberOfDocs; ++i) {
@@ -314,6 +319,11 @@ public class PageRank {
 		return totalVisits;
 	}
 
+	/**
+	 * Start m times in every node
+	 * Go until surfer is bored or max jumps
+	 * Mark the end point
+	 */
 	public int mc2(int numberOfDocs, int t) {
 		int totalVisits	= 0;
 		for (int i = 0; i < numberOfDocs; ++i) {
@@ -336,6 +346,12 @@ public class PageRank {
 		return totalVisits;
 	}
 
+
+	/**
+	 * Start m times in every node
+	 * Go until surfer is bored or dangling node
+	 * Mark all visits along the path
+	 */
 	public int mc4(int numberOfDocs) {
 		int totalVisits = 0;
 		for (int i = 0; i < numberOfDocs; ++i) {
@@ -353,6 +369,12 @@ public class PageRank {
 		return totalVisits;
 	}
 
+
+	/**
+	 * Random start point
+	 * Go until surfer is bored or max jumps
+	 * Mark all visits along the path
+	 */
 	public int mc5(int numberOfDocs) {
 		int totalVisits = 0;
 		for (int i = 0; i < numberOfDocs; ++i) {

@@ -43,7 +43,7 @@ public interface Index {
     public HashMap<Integer, Double> docLengthsEuclidean = new HashMap<Integer, Double>();
 
     /** Intermediary helper for Euclidean lengths */
-    public ArrayList<HashMap<String, Integer>> tf_vector = new ArrayList<>();
+    // public ArrayList<HashMap<String, Integer>> tf_vector = new ArrayList<>();
     public HashMap<String, Integer> df_map = new HashMap<>();
 }
 

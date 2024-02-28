@@ -65,7 +65,8 @@ public class Indexer {
                         }
                     }
                 } else {
-                    index.tf_vector.add(new HashMap<>());
+                    // index.tf_vector.add(new HashMap<>());
+                    HashSet<String> seen = new HashSet<>();
                     // First register the document and get a docID
                     int docID = generateDocID();
                     if ( docID%1000 == 0 ) System.err.println( "Indexed " + docID + " files" );
@@ -77,12 +78,15 @@ public class Indexer {
                             String token = tok.nextToken();
                             insertIntoIndex( docID, token, offset++ );
                             if (calculate_euclideans) {
-                                if (index.tf_vector.get(docID).get(token) == null) {
-                                    index.tf_vector.get(docID).put(token, 0);
-                                    if (index.df_map.get(token) == null) index.df_map.put(token, 0);
+                                // if (index.tf_vector.get(docID).get(token) == null) {
+                                //     index.tf_vector.get(docID).put(token, 0);
+                                if (index.df_map.get(token) == null) index.df_map.put(token, 0);
+                                if (!seen.contains(token)) {
                                     index.df_map.merge(token, 1, Integer::sum);
+                                    seen.add(token);
                                 }
-                                index.tf_vector.get(docID).merge(token, 1, Integer::sum);
+                                // }
+                                // index.tf_vector.get(docID).merge(token, 1, Integer::sum);
                             }
                         }
                         index.docNames.put( docID, f.getPath() );

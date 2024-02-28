@@ -52,8 +52,6 @@ Manhattan tf x idf:
 1*ln(17478/1907) + 1*ln(17478/7) + 1*ln(17478/10312) + 1*ln(17478/28) + 1*ln(17478/26) = 23.5129
 ```
 
-(Note: the idf in the query is ln(2/1) for both terms)
-
 **What is the cosine similarity between the query and the two documents (in the specified spaces using the specified length normalization, rounded to 4 decimal places)? Don’t forget to use idf for the query terms in the two last rows.**
 
 ```
@@ -64,8 +62,8 @@ Euclidean: (1*1) / (sqrt(2) * sqrt(6)) = 0.2887
 Manhattan: (1*1) / (2 * 6) = 0.0833
 
 tf x idf:
-Euclidean: (1*ln(17478/10312) * 1*ln(17478/10312)) / (sqrt((1*ln(17478/10312))^2 + (1*ln(17478/376))^2) * sqrt((1*ln(17478/1907))^2 + (1*ln(17478/378))^2 + (1*ln(17478/236))^2 + (1*ln(17478/30))^2 + (1*ln(17478/376))^2 + (1*ln(17478/1377))^2)) = 0.0072
-Manhattan: (1*ln(17478/10312) * 1*ln(17478/10312)) / ((1*ln(17478/10312) + 1*ln(17478/376)) * (1*ln(17478/1907) + 1*ln(17478/378) + 1*ln(17478/236) + 1*ln(17478/30) + 1*ln(17478/376) + 1*ln(17478/1377))) = 0.0028
+Euclidean: (1*ln(17478/376) * 1*ln(17478/376)) / (sqrt((1*ln(17478/10312))^2 + (1*ln(17478/376))^2) * sqrt((1*ln(17478/1907))^2 + (1*ln(17478/378))^2 + (1*ln(17478/236))^2 + (1*ln(17478/30))^2 + (1*ln(17478/376))^2 + (1*ln(17478/1377))^2)) = 0.3805
+Manhattan: (1*ln(17478/376) * 1*ln(17478/376)) / ((1*ln(17478/10312) + 1*ln(17478/376)) * (1*ln(17478/1907) + 1*ln(17478/378) + 1*ln(17478/236) + 1*ln(17478/30) + 1*ln(17478/376) + 1*ln(17478/1377))) = 0.1461
 
 
 Davis_Funeral_Chapel.f:
@@ -83,8 +81,8 @@ Manhattan: (1*ln(17478/10312) * 1*ln(17478/10312)) / ((1*ln(17478/10312) + 1*ln(
 | -------------------------- | ------- | ---------------------- |
 | Euclidean length, tf       | 0.2887  | 0.3162                 |
 | Manhattan length, tf       | 0.0833  | 0.1000                 |
-| Euclidean length, tf x idf | 0.0072  | 0.0059                 |
-| Manhattan length, tf x idf | 0.0028  | 0.0027                 |
+| Euclidean length, tf x idf | 0.3805  | 0.0059                 |
+| Manhattan length, tf x idf | 0.1461  | 0.0027                 |
 
 **What is the cosine similarity (rounded to 4 decimal places) if the query coordinates are considered to be (1,1)?**
 
@@ -96,8 +94,8 @@ Euclidean: (1*1) / (sqrt(2) * sqrt(6)) = 0.2887
 Manhattan: (1*1) / (2 * 6) = 0.0833
 
 tf x idf:
-Euclidean: (1 * 1*ln(17478/10312)) / (sqrt(2) * sqrt((1*ln(17478/1907))^2 + (1*ln(17478/378))^2 + (1*ln(17478/236))^2 + (1*ln(17478/30))^2 + (1*ln(17478/376))^2 + (1*ln(17478/1377))^2)) = 0.0373
-Manhattan: (1*ln(17478/10312) * 1*ln(17478/10312)) / (2 * (1*ln(17478/1907) + 1*ln(17478/378) + 1*ln(17478/236) + 1*ln(17478/30) + 1*ln(17478/376) + 1*ln(17478/1377))) = 0.0060
+Euclidean: (1 * 1*ln(17478/376)) / (sqrt(2) * sqrt((1*ln(17478/1907))^2 + (1*ln(17478/378))^2 + (1*ln(17478/236))^2 + (1*ln(17478/30))^2 + (1*ln(17478/376))^2 + (1*ln(17478/1377))^2)) = 0.2716
+Manhattan: (1 * 1*ln(17478/376)) / (2 * (1*ln(17478/1907) + 1*ln(17478/378) + 1*ln(17478/236) + 1*ln(17478/30) + 1*ln(17478/376) + 1*ln(17478/1377))) = 0.0831
 
 
 Davis_Funeral_Chapel.f:
@@ -115,12 +113,12 @@ Manhattan: (1*ln(17478/10312) * 1*ln(17478/10312)) / (2 * (1*ln(17478/1907) + 1*
 | -------------------------- | ------- | ---------------------- |
 | Euclidean length, tf       | 0.2887  | 0.3162                 |
 | Manhattan length, tf       | 0.0833  | 0.1000                 |
-| Euclidean length, tf x idf | 0.0373  | 0.0161                 |
-| Manhattan length, tf x idf | 0.0060  | 0.0059                 |
+| Euclidean length, tf x idf | 0.2716  | 0.0161                 |
+| Manhattan length, tf x idf | 0.0831  | 0.0059                 |
 
 ## Task 2.4
 
-The only one similar two similar to the intersection query from 1.5 are Elaine_Kasimatis.f and Evelyn_Silvia.f.
+The only two similar to the intersection query from 1.5 are Elaine_Kasimatis.f and Evelyn_Silvia.f.
 
 The ranked retrieval only returns very short documents.
 
@@ -265,6 +263,8 @@ Manhattan:
 - Recall: 0/X
 
 ## Task 2.7
+
+`javac PageRank.java && java -Xmx1g PageRank linksDavis.txt`
 
 ![](./goodness-graph.png)
 
