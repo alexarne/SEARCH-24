@@ -1,0 +1,70 @@
+//
+//  Information retrieval course
+//  First version: Johan Boye 2016
+//
+// In this file you can put your regular expressions
+// for matching non-standard words (like mail addresses).
+//
+// As you have probably already understood, lines beginning
+// with "//" are comments.
+//
+// The regular expression below is an example of a useful
+// pattern. You can keep it, modify it, or remove it, as you
+// wish.
+
+
+// // Twenty-four seven
+// \d+/\d+
+
+
+// ADD YOUR PATTERNS HERE
+
+// The patterns will be tried from top to bottom, so it is a
+// good idea to put more specific patterns above more general
+// patterns.
+
+// URLs
+https?:\/\/.+
+
+// E-mails
+[\w\.]+@[\w\.]+\.[\w]+
+
+// Phone numbers (e.g. 1-213-555-0123, +13015550100)
+(\d+-)+\d+
+\+\d+
+
+// Combined words (e.g. fully-qualified-person)
+(\w+-)+\w+
+
+// "Marked" numbers (e.g. 7,919,900)
+(\d+,)+\d+
+
+// Dollar amounts (e.g. $80)
+\$\d+
+
+// Combined words (e.g. can't)
+\w+'\w+
+// Allow apostrophe at the beginning if not also at the end (e.g. 'em but not 'gaffe')
+//'\w+\Z
+'em
+
+// Time clock (e.g. 18:15:34)
+(\d+:)+\d+
+
+// Twenty-four seven
+\d+/\d+
+
+// Section digits (e.g. 2.4.1), IP numbers (e.g. 192.168.255.255)
+(\d+\.)+\d+
+
+// Abbreviations
+(\w+\.){2,}
+
+// File extensions (e.g. cake.ppt)
+\w+\.(ppt|doc|xlsx|jpg|jpeg|png|docx|txt)
+
+
+
+
+
+
