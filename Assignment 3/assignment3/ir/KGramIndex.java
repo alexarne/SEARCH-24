@@ -54,7 +54,20 @@ public class KGramIndex {
         // 
         // YOUR CODE HERE
         //
-        return null;
+        List<KGramPostingsEntry> result = new ArrayList<>();
+        int i1 = 0, i2 = 0;
+        while (i1 < p1.size() && i2 < p2.size()) {
+            if (p1.get(i1).tokenID == p2.get(i2).tokenID) {
+                result.add(new KGramPostingsEntry(p1.get(i1)));
+                ++i1;
+                ++i2;
+            } else if (p1.get(i1).tokenID < p2.get(i2).tokenID) {
+                ++i1;
+            } else if (p1.get(i1).tokenID > p2.get(i2).tokenID) {
+                ++i2;
+            }
+        }
+        return result;
     }
 
 
@@ -63,6 +76,19 @@ public class KGramIndex {
         //
         // YOUR CODE HERE
         //
+        if (term2id.get(token) != null) return;
+        int termID = generateTermID();
+        term2id.put(token, termID);
+        id2term.put(termID, token);
+
+        token = "^" + token + "$";
+        for (int i = 0; i < token.length() - K + 1; ++i) {
+            String kgram = token.substring(i, i+K);
+            if (index.get(kgram) == null) index.put(kgram, new ArrayList<>());
+            if (index.get(kgram).size() != 0 && index.get(kgram).get(index.get(kgram).size()-1).tokenID == lastTermID)
+                continue; 
+            index.get(kgram).add(new KGramPostingsEntry(termID));
+        }
     }
 
     /** Get postings for the given k-gram */
@@ -70,7 +96,25 @@ public class KGramIndex {
         //
         // YOUR CODE HERE
         //
-        return null;
+        List<KGramPostingsEntry> result = index.get(kgram);
+        if (result == null) result = new ArrayList<>();
+        return result;
+    }
+
+    public List<KGramPostingsEntry> getWords(String[] kgrams) {
+        List<KGramPostingsEntry> postings = null;
+        for (String kgram : kgrams) {
+            if (kgram.length() != K) {
+                System.err.println("Cannot search k-gram index: " + kgram.length() + "-gram provided instead of " + K + "-gram");
+            }
+
+            if (postings == null) {
+                postings = getPostings(kgram);
+            } else {
+                postings = intersect(postings, getPostings(kgram));
+            }
+        }
+        return postings;
     }
 
     /** Get id of a term */
@@ -148,10 +192,10 @@ public class KGramIndex {
         } else {
             int resNum = postings.size();
             System.err.println("Found " + resNum + " posting(s)");
-            if (resNum > 10) {
-                System.err.println("The first 10 of them are:");
-                resNum = 10;
-            }
+            // if (resNum > 10) {
+            //     System.err.println("The first 10 of them are:");
+            //     resNum = 10;
+            // }
             for (int i = 0; i < resNum; i++) {
                 System.err.println(kgIndex.getTermByID(postings.get(i).tokenID));
             }

@@ -40,9 +40,9 @@ public class Engine {
     Searcher searcher;
 
     /** K-gram index */
-    KGramIndex kgIndex = null;
+    // KGramIndex kgIndex = null;
     // Assignment 3: Comment the line above and uncomment the next line
-    // KgramIndex kgIndex = new KGramIndex(2);
+    KGramIndex kgIndex = new KGramIndex(2);
 
     /** Spell checker */
     SpellChecker speller;
@@ -114,6 +114,12 @@ public class Engine {
             calculateEuclideanLengths(new File( dirNames.get( 0 )));
             System.out.println("calculation finished...");
             writeEuclideanLengths();
+        }
+        if (kgIndex != null) {
+            System.out.println("Number of words containing bigram \"ve\": " + 
+                kgIndex.getWords(new String[]{ "ve" }).size());
+            System.out.println("Number of words containing bigrams \"th he\": " + 
+                kgIndex.getWords(new String[]{ "th", "he" }).size());
         }
     }
 

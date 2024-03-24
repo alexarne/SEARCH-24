@@ -229,3 +229,6 @@ If we dont omit the selected document, we may inflate the score since it is almo
 We see that the nDCG improves slightly, but both precision and recall are reduced because there are much fewer relevant documents returned.
 
 ## Task 3.3
+
+Number of words containing bigram "ve": 7497
+Number of words containing bigrams "th he": 3194

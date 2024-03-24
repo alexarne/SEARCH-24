@@ -101,12 +101,12 @@ public class Searcher {
                     default:
                         break;
                 }
-                for (int i = 0; i < result.size() && i < 50; ++i) {
-                    System.out.println(index.docNames.get(result.get(i).docID));
-                    // if (index.docNames.get(result.get(i).docID).equals("..\\..\\davisWiki\\Mathematics.f")) {
-                    //     System.out.println("found " + i);
-                    // }
-                }
+                // for (int i = 0; i < result.size() && i < 50; ++i) {
+                //     System.out.println(index.docNames.get(result.get(i).docID));
+                //     // if (index.docNames.get(result.get(i).docID).equals("..\\..\\davisWiki\\Mathematics.f")) {
+                //     //     System.out.println("found " + i);
+                //     // }
+                // }
                 break;
         
             default:
