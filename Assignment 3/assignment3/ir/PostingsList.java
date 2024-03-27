@@ -67,5 +67,10 @@ public class PostingsList {
     public void sort() {
         Collections.sort(list);
     }
+
+    public void sortDocs() {
+        Collections.sort(list,
+            (PostingsEntry a, PostingsEntry b) -> a.docID - b.docID);
+    }
 }
 

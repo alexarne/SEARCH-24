@@ -46,6 +46,15 @@ public class PostingsEntry implements Comparable<PostingsEntry>, Serializable {
         occurrences.add(position);
     }
 
+    public void addOccurrences(ArrayList<Integer> occs) {
+        for (Integer occ : occs) addOccurrence(occ);
+        sortOccurrences();
+    }
+
+    public void sortOccurrences() {
+        Collections.sort(occurrences);
+    }
+
     public ArrayList<Integer> getOccurrences() {
         if (lazy_occurrences == null) return occurrences;
         String[] positions = lazy_occurrences.split(";");
@@ -97,6 +106,7 @@ public class PostingsEntry implements Comparable<PostingsEntry>, Serializable {
     public PostingsEntry(PostingsEntry entry) {
         this.docID = entry.docID;
         this.occurrences = entry.getOccurrences();
+        this.score = entry.score;
     }
 }
 

@@ -46,9 +46,78 @@ public class Searcher {
         // Fetch all postings lists
         PostingsList[] lists = new PostingsList[query.size()];
         for (int i = 0; i < query.size(); ++i) {
-            lists[i] = index.getPostings(query.queryterm.get(i).term);
-            // Replace null with empty PostingsList for simplicity
-            if (lists[i] == null) lists[i] = new PostingsList();
+            if (kgIndex == null || !query.queryterm.get(i).term.contains("*")) {
+                lists[i] = index.getPostings(query.queryterm.get(i).term);
+                // Replace null with empty PostingsList for simplicity
+                if (lists[i] == null) lists[i] = new PostingsList();
+            } else {
+                // lists[i] = new PostingsList();
+                // ArrayList<String> words = kgIndex.getWildcardWords(query.queryterm.get(i).term);
+                // for (String word : words) {
+                //     PostingsList pl = index.getPostings(word);
+                //     for (int j = 0; j < pl.size(); ++j) {
+                //         lists[i].insert(pl.get(j));
+                //     }
+                // }
+                // lists[i].sortDocs();
+
+
+
+                PostingsList list = new PostingsList();
+                ArrayList<String> words = kgIndex.getWildcardWords(query.queryterm.get(i).term);
+                for (String word : words) {
+                    PostingsList pl = index.getPostings(word);
+                    for (int j = 0; j < pl.size(); ++j) {
+                        list.insert(pl.get(j));
+                    }
+                }
+                list.sortDocs();
+                PostingsList cleaned = new PostingsList();
+                int lastDoc = -1;
+                for (int j = 0; j < list.size(); ++j) {
+                    PostingsEntry pe = list.get(j);
+                    if (pe.docID != lastDoc) {
+                        cleaned.insert(pe);
+                    } else {
+                        cleaned.get(cleaned.size()-1).addOccurrences(pe.getOccurrences());
+                    }
+                    lastDoc = pe.docID;
+                }
+                
+                for (int j = 0; j < cleaned.size(); ++j) {
+                    // if (cleaned.get(j).docID == 6381) {
+                    //     System.out.println("fauxhawk before sort on " + query.queryterm.get(i).term);
+                    //     ArrayList<Integer> occs = cleaned.get(j).getOccurrences();
+                    //     for (Integer occ : occs) {
+                    //         System.out.print(occ + " ");
+                    //     }
+                    //     System.out.println();
+                    // }
+                    cleaned.get(j).getOccurrences();
+                    cleaned.get(j).sortOccurrences();
+                    // if (cleaned.get(j).docID == 6381) {
+                    //     System.out.println("fauxhawk after sort on " + query.queryterm.get(i).term);
+                    //     ArrayList<Integer> occs = cleaned.get(j).getOccurrences();
+                    //     for (Integer occ : occs) {
+                    //         System.out.print(occ + " ");
+                    //     }
+                    //     System.out.println();
+                    // }
+                }
+                lists[i] = cleaned;
+
+                // for (int j = 0; j < cleaned.size(); ++j) {
+                //     if (cleaned.get(j).docID == 6381) {
+                //         PostingsEntry pe = cleaned.get(j);
+                //         System.out.println("fauxhawk on " + query.queryterm.get(i).term);
+                //         ArrayList<Integer> occs = pe.getOccurrences();
+                //         for (Integer occ : occs) {
+                //             System.out.print(occ + " ");
+                //         }
+                //         System.out.println();
+                //     }
+                // }
+            }
         }
 
         // If query is empty, return empty
@@ -112,7 +181,7 @@ public class Searcher {
             default:
                 break;
         }
-        
+        if (result.size() == 0) return null;
         return result;
     }
 
@@ -133,18 +202,27 @@ public class Searcher {
         PostingsList result = new PostingsList();
         double N = index.docNames.size();
         for (QueryTerm t : query.queryterm) {
-            PostingsList pl = index.getPostings(t.term);
-            // Assumes unique terms in query
-            double w_tq = 1;
-            double idf_t = Math.log(N / pl.size());
-            for (int i = 0; i < pl.size(); ++i) {
-                int d = pl.get(i).docID;
-                int len_d = index.docLengths.get(d);
-                // double len_d = index.docLengthsEuclidean.get(d);
-                double tf_dt = pl.get(i).getOccurrences().size();
-                double w_td = tf_dt * idf_t;
-                if (result.getByDocID(d) == null) result.insert(new PostingsEntry(d));
-                result.getByDocID(d).score += w_td * w_tq / len_d;
+            ArrayList<String> words = new ArrayList<>();
+            if (kgIndex == null || !t.term.contains("*")) {
+                words.add(t.term);
+            } else {
+                words = kgIndex.getWildcardWords(t.term);
+            }
+            for (String word : words) {
+                // System.out.println(word);
+                PostingsList pl = index.getPostings(word);
+                // Assumes unique terms in query
+                double w_tq = t.weight; 
+                double idf_t = Math.log(N / pl.size());
+                for (int i = 0; i < pl.size(); ++i) {
+                    int d = pl.get(i).docID;
+                    int len_d = index.docLengths.get(d);
+                    // double len_d = index.docLengthsEuclidean.get(d);
+                    double tf_dt = pl.get(i).getOccurrences().size();
+                    double w_td = tf_dt * idf_t;
+                    if (result.getByDocID(d) == null) result.insert(new PostingsEntry(d));
+                    result.getByDocID(d).score += w_td * w_tq / len_d;
+                }
             }
         }
         for (int i = 0; i < result.size(); ++i) {

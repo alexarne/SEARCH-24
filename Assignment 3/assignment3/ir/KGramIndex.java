@@ -22,6 +22,7 @@ public class KGramIndex {
 
     /** Index from k-grams to list of term ids that contain the k-gram */
     HashMap<String,List<KGramPostingsEntry>> index = new HashMap<String,List<KGramPostingsEntry>>();
+    // HashMap<String, ArrayList<String>> kgramMap = new HashMap<>();
 
     /** The ID of the last processed term */
     int lastTermID = -1;
@@ -82,11 +83,13 @@ public class KGramIndex {
         id2term.put(termID, token);
 
         token = "^" + token + "$";
+        // kgramMap.put(token, new ArrayList<>());
         for (int i = 0; i < token.length() - K + 1; ++i) {
             String kgram = token.substring(i, i+K);
+            // kgramMap.get(token).add(kgram);
             if (index.get(kgram) == null) index.put(kgram, new ArrayList<>());
             if (index.get(kgram).size() != 0 && index.get(kgram).get(index.get(kgram).size()-1).tokenID == lastTermID)
-                continue; 
+                continue;
             index.get(kgram).add(new KGramPostingsEntry(termID));
         }
     }
@@ -101,7 +104,7 @@ public class KGramIndex {
         return result;
     }
 
-    public List<KGramPostingsEntry> getWords(String[] kgrams) {
+    public ArrayList<String> getWords(String[] kgrams) {
         List<KGramPostingsEntry> postings = null;
         for (String kgram : kgrams) {
             if (kgram.length() != K) {
@@ -114,7 +117,48 @@ public class KGramIndex {
                 postings = intersect(postings, getPostings(kgram));
             }
         }
-        return postings;
+        ArrayList<String> words = new ArrayList<>();
+        for (KGramPostingsEntry entry : postings) {
+            words.add(id2term.get(entry.tokenID));
+        }
+        return words;
+    }
+
+    public ArrayList<String> getWildcardWords(String wildcard) {
+        int asterisk = wildcard.indexOf("*");
+        String prefix = "^" + wildcard.substring(0, asterisk);
+        String suffix = wildcard.substring(asterisk+1) + "$";
+        ArrayList<String> kgrams = new ArrayList<>();
+        for (int i = 0; i < prefix.length() - K + 1; ++i) {
+            String kgram = prefix.substring(i, i+K);
+            kgrams.add(kgram);
+        }
+        for (int i = 0; i < suffix.length() - K + 1; ++i) {
+            String kgram = suffix.substring(i, i+K);
+            kgrams.add(kgram);
+        }
+        ArrayList<String> words = getWords(kgrams.toArray(new String[0]));
+        ArrayList<String> cleaned = new ArrayList<>();
+        for (String word : words) {
+            if (!word.startsWith(prefix.substring(1))) continue;
+            if (!word.endsWith(suffix.substring(0, suffix.length()-1))) continue;
+            cleaned.add(word);
+        }
+        // System.out.println("Wildcard " + wildcard + " gave words:");
+        // for (String word : cleaned) {
+        //     System.out.println(word);
+        // }
+        return cleaned;
+    }
+
+    public ArrayList<String> getKgrams(String term) {
+        // if (kgramMap.get(term) != null) return kgramMap.get(term);
+        ArrayList<String> kgrams = new ArrayList<>();
+        for (int i = 0; i < term.length() - K + 1; ++i) {
+            String kgram = term.substring(i, i+K);
+            kgrams.add(kgram);
+        }
+        return kgrams;
     }
 
     /** Get id of a term */

@@ -120,31 +120,25 @@ public class Query {
         // for (QueryTerm qt : queryterm) {
         //     System.out.println(qt.term + " - " + qt.weight);
         // }
-        double gamma = 0;
+        
+        int numDr = 0;
+        HashMap<String, Integer> Dr_centroid = new HashMap<>();
+        for (int i = 0; i < docIsRelevant.length; ++i) {
+            if (docIsRelevant[i]) {
+                HashMap<String, Integer> tf = getTfVector(engine.index.docNames.get(results.get(i).docID));
+                for (String term : tf.keySet()) {
+                    if (Dr_centroid.get(term) == null) Dr_centroid.put(term, 0);
+                    Dr_centroid.merge(term, tf.get(term), Integer::sum);
+                    // System.out.println("term " + term + " freq " + tf.get(term));
+                }
+                ++numDr;
+            }
+        }
+        if (numDr == 0) return;
 
         for (QueryTerm qt : queryterm) {
             qt.weight = qt.weight * alpha;
         }
-        
-        int numDr = 0;
-        int numDocs = engine.index.docNames.size();
-        HashMap<String, Double> Dr_centroid = new HashMap<>();
-        for (int i = 0; i < docIsRelevant.length; ++i) {
-            if (docIsRelevant[i]) {
-                ++numDr;
-                HashMap<String, Integer> tf = getTfVector(engine.index.docNames.get(results.get(i).docID));
-                Integer len = engine.index.docLengths.get(results.get(i).docID);
-                for (String term : tf.keySet()) {
-                    Double df = (double) engine.index.getPostings(term).size();
-                    Double idf = Math.log(numDocs / df);
-                    Double tf_idf = tf.get(term) * idf / len;
-                    if (Dr_centroid.get(term) == null) Dr_centroid.put(term, 0d);
-                    Dr_centroid.merge(term, tf_idf, Double::sum);
-                    // System.out.println("term " + term + " freq " + tf.get(term) + " idf " + idf + " = " + tf_idf);
-                }
-            }
-        }
-
         for (QueryTerm qt : queryterm) {
             if (Dr_centroid.get(qt.term) == null) continue;
             qt.weight += beta * Dr_centroid.get(qt.term) / numDr;

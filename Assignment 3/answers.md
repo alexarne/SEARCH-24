@@ -2,6 +2,8 @@
 
 ## Task 3.2
 
+IDCG assuming the rating docs are the ONLY relevant documents for the query.
+
 ```
 DCG_50 =
 1 / log_2(2) +
@@ -116,119 +118,78 @@ nDCG_50 = DCG_50 / IDCG_50
 Mathematics.f marked.
 
 ```
-Missing ratings:
-"Pladd.f" : 0,
-"Calculus_Room.f" : 0,
-"MSB.f" : 0,
-"Tri_Delt.f" : 0,
-"The_Gap.f" : 0,
-"AmitSahoo.f" : 0,
-"DavePoole.f" : 0,
-"DavidPoole.f" : 0,
-"David_Poole.f" : 0,
-"Physics_and_Geology.f" : 0,
-"Language_Learning_Center.f" : 0,
-"Civil_Engineering.f" : 0,
-"RoyWright.f" : 0,
-"Biological_Sciences.f" : 0,
-"Biology.f" : 0,
-"Division_of_Biological_Sciences.f" : 0,
-"AJThompson.f" : 0,
-"SeatonTsai.f" : 0,
-"Majors.f" : 2,
-"WFCB.f" : 0,
-"Minors.f" : 0,
-"Environmental_Science_and_Management.f" : 0,
-"EthanLeavy.f" : 0,
-"Professor.f" : 0,
-"GeorgeSuarez.f" : 0,
-"FrankWu.f" : 0,
-"Computer_Science_and_Engineering.f" : 0,
-"ECS.f" : 0,
-"matt%27s_courses.f" : 0,
-"Weeder_Classes.f" : 0,
-"LarinLucero.f" : 0,
-"Apex_Computer_Services.f" : 0,
-"Measures.f" : 0,
-"NoraSandstedt.f" : 0,
-"Millenniumchilddevelopmentcenter.f" : 0,
-"UC_Davis_Chinese_Program.f" : 0,
-"Staples.f" : 0,
-"CSE.f" : 0,
-"S.T.E.P..f" : 0,
-"Undergrads.f" : 0,
-"Undergraduates.f" : 0,
-"Christian_%27Eight-Ball%27_Alvarez.f" : 0,
+Missing docs given 0 rating
 
 DCG_50 =
-0 / log_2(2) +
+1 / log_2(2) +
+0 / log_2(3) +
 0 / log_2(4) +
 0 / log_2(5) +
 0 / log_2(6) +
 0 / log_2(7) +
 0 / log_2(8) +
 0 / log_2(9) +
-0 / log_2(10) +
+
 0 / log_2(11) +
 0 / log_2(12) +
 1 / log_2(13) +
-0 / log_2(14) +
+2 / log_2(14) +
 0 / log_2(15) +
-0 / log_2(16) +
+3 / log_2(16) +
 0 / log_2(17) +
 0 / log_2(18) +
 0 / log_2(19) +
 0 / log_2(20) +
 0 / log_2(21) +
 0 / log_2(22) +
-2 / log_2(23) +
+0 / log_2(23) +
 0 / log_2(24) +
 0 / log_2(25) +
-1 / log_2(26) +
+0 / log_2(26) +
 0 / log_2(27) +
-0 / log_2(28) +
-0 / log_2(29) +
+1 / log_2(28) +
+1 / log_2(29) +
 0 / log_2(30) +
 0 / log_2(31) +
 0 / log_2(32) +
 0 / log_2(33) +
 0 / log_2(34) +
-3 / log_2(35) +
+0 / log_2(35) +
 0 / log_2(36) +
 0 / log_2(37) +
 0 / log_2(38) +
 0 / log_2(39) +
 0 / log_2(40) +
 0 / log_2(41) +
-0 / log_2(42) +
+1 / log_2(42) +
 0 / log_2(43) +
 0 / log_2(44) +
 0 / log_2(45) +
 0 / log_2(46) +
 0 / log_2(47) +
-2 / log_2(48) +
-0 / log_2(49) +
+0 / log_2(48) +
+1 / log_2(49) +
 0 / log_2(50) +
 0 / log_2(51)
-= 1.86809519608
+= 3.32295127161
 
-IDCG_50 =
-3 / log_2(2) +
-3 / log_2(3) +
-2 / log_2(4) +
-2 / log_2(5) +
-1 / log_2(6) +
-1 / log_2(7)
-= 7.4972023712
+IDCG_50 = same
+= 20.8547064738
 
-nDCG_50 = 0.24917230502
+nDCG_50 = 0.15933819427
 ```
 
 If we dont omit the selected document, we may inflate the score since it is almost guaranteed that the selected document will appear very high in the results.
 
-We see that the nDCG improves slightly, but both precision and recall are reduced because there are much fewer relevant documents returned.
+We see that the nDCG worsens slightly, and that both precision and recall are reduced because there are fewer relevant documents returned. However, those results are still rated highly, but placed suboptimally in the ranking.
 
 ## Task 3.3
+
+```
+compile_all.bat
+java -cp classes ir.KGramIndex -f kgram_test.txt -p patterns.txt -k 2 -kg "ve"
+java -cp classes ir.KGramIndex -f kgram_test.txt -p patterns.txt -k 2 -kg "th he"
+```
 
 Number of words containing bigram "ve": 7497
 Number of words containing bigrams "th he": 3194
